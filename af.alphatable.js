@@ -43,7 +43,7 @@
                 className: "stickyHeader tableHeader",
                 html: $(this.el).find(".tableHeader").html()
             });
-            stickyHeader.get(0).style.cssText = ";z-index:9999;position:absolute;top:0px;width:100%;";
+            stickyHeader.get(0).style.cssText = ";z-index:9998;position:absolute;top:0px;width:100%;";
 
             $(this.el).parent().append(stickyHeader);
             this.header = stickyHeader;
@@ -57,26 +57,29 @@
                 if (that.scroller.scrollTop > 0) return;
                 thePos = Math.abs(thePos);
                 if (!isMoving) {
-
                     for (var i = 0; i < that.offset.length; i++) {
                         var checkPos = that.offset[i];
+                        var checkPosSuc = that.offset[i+1]; //
+						if(checkPosSuc==undefined)checkPosSuc = 1000000000000;
                         if (checkPos >= (thePos) && checkPos <= (thePos + that.boxHeight)) {
                             isMoving = i;
                             break;
                         }
-
+						else if(thePos > checkPos && thePos < (checkPosSuc-that.boxHeight) ){
+							isMoving = i;
+                            break;
+						}
                     }
                 }
                 var dir = thePos > prevPos;
-                console.log(that.scroller.scrollTop);
                 prevPos = thePos;
-                if (isMoving) {
+                if (isMoving >= 0) {
                     checkPos = that.offset[isMoving];
                     var moveTo = (thePos - checkPos) + that.boxHeight;
                     moveTo *= -1;
-
                     if (moveTo >= 0) {
-                        that.header.html($(that.el).find(".tableHeader").get(isMoving - 1).innerHTML);
+                        if(isMoving > 0 )that.header.html($(that.el).find(".tableHeader").get(isMoving - 1).innerHTML);
+                        else if(isMoving == 0 )that.header.html($(that.el).find(".tableHeader").get(isMoving).innerHTML);
                         isMoving = false;
                     } else if (Math.abs(moveTo) >= Math.abs(that.boxHeight)) {
                         that.header.html($(that.el).find(".tableHeader").get(isMoving).innerHTML);
@@ -87,14 +90,12 @@
                     return;
                 }
                 that.header.cssTranslate("0,0");
-
-
             });
             this.getOffsets();
             this.boxHeight = numOnly(stickyHeader.computedStyle("height"));
 
         };
-        var boxCSS = "position:absolute;top:0px;right:20px;width:20px;font-size:6pt;font-weight:bold;color:#000;opacity:.5;border-radius:5px;text-align:center;z-index:9999;border:1px solid black;background:#666;padding-top:5px;padding-bottom:5px;";
+        var boxCSS = "position:absolute;top:5%;right:10px;width:20px;font-size:6pt;font-weight:bold;color:#000;opacity:.5;border-radius:5px;text-align:center;z-index:9999;border:1px solid black;background:#666;padding-top:5px;padding-bottom:5px;height:90%;";
         alphaTable.prototype = {
             listCssClass: "",
             letterBox: null,
